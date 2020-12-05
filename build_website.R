@@ -24,7 +24,7 @@ file.remove("./docs/journal.html")
 file.rename(from = "./docs/journal_encrypted.html", 
             to   = "./docs/journal.html")
 
-system( paste0("staticrypt ./docs/grigaliusMarceniukas.html ", LAB_KEY) )
+#system( paste0("staticrypt ./docs/grigaliusMarceniukas.html ", LAB_KEY) )
 
 # Remove and rename resulting files
 #file.remove("./docs/journal.html")
