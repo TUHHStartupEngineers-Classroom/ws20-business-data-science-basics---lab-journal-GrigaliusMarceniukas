@@ -10,6 +10,7 @@ library(httr)
 library(RSQLite)
 library(ggplot2)
 library(dplyr)
+library(purrr)
 
 
 # create small database: model names and price of 
@@ -26,8 +27,8 @@ names <-  html %>%
   html_nodes(css = ".a-heading.a-heading--small") %>% 
   html_text() %>% 
   stringr::str_extract("(?<= ).*(?=)")%>%
-  discard(.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
-  #purrr::discard(names,.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
+ # discard(.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
+  purrr::discard(names,.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
 names
 
 
@@ -37,13 +38,12 @@ price <-  html %>%
   html_text() %>% 
   #html_attr("class")%>%
   stringr::str_extract("(?<=).*(?=)") %>%
-  discard(.p = ~stringr::str_detect(.x," ₤"))%>%
+  #discard(.p = ~stringr::str_detect(.x," ₤"))%>%
+  purrr::discard(names,.p = ~stringr::str_detect(.x," ₤"))%>%
   as_tibble()%>%
   filter(row_number() %% 2 == 1)
 
 price
 
 
-tibble(Model=names, Cost=price)
-
-
+tibble(Model=names, "Cost  "=price)

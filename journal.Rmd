@@ -16,36 +16,21 @@ output:
 knitr::opts_chunk$set(message=FALSE,warning=FALSE, cache=TRUE)
 ```
 
-**IMPORTANT:** You can delete everything in here and start fresh. You might want to start by not deleting anything above this line until you know what that stuff is doing.
 
-This is an `.Rmd` file. It is plain text with special features. Any time you write just like this, it will be compiled to normal text in the website. If you put a \# in front of your text, it will create a top level-header.
-
-# My first post
+# Compilet dates
 
 Last compiled: `r Sys.Date()`
 
-Notice that whatever you define as a top level header, automatically gets put into the table of contents bar on the left. 
-
-## Second level header
-
-You can add more headers by adding more hashtags. These won't be put into the table of contents
-
-### third level header
-
-Here's an even lower level header
-
-# My second post (note the order)
 
 Last compiled: `r Sys.Date()`
 
-I'm writing this tutorial going from the top down. And, this is how it will be printed. So, notice the second post is second in the list. If you want your most recent post to be at the top, then make a new post starting at the top. If you want the oldest first, do, then keep adding to the bottom
-
-# Adding R stuff
 
 
-## Tidyverse
 
-### Tasks
+
+
+# Tidyverse
+
 ```{r}
 # SALES ANALYSIS ----
 
@@ -396,8 +381,8 @@ sales_by_year_state_tbl %>%
 
 ```
 
-## Data acquisition
-### API task
+# Data acquisition
+## API task
 ```{r}
 # 1.0 LIBRARIES ----
 
@@ -439,7 +424,10 @@ edition_count<-data_lst%>%
   purrr::pluck("entries", "edition_count")
 ebook_count<-data_lst%>%
   purrr::pluck("entries", "ebook_count")
+```
 
+A table from a random API 
+```{r}
 tibble(title ,work_count ,edition_count ,ebook_count)
 
 ```
@@ -447,7 +435,7 @@ tibble(title ,work_count ,edition_count ,ebook_count)
 
 
 
-### Scraping task
+## Scraping task
 ```{r}
 
 # 1.0 LIBRARIES ----
@@ -478,8 +466,8 @@ names <-  html %>%
   html_nodes(css = ".a-heading.a-heading--small") %>% 
   html_text() %>% 
   stringr::str_extract("(?<= ).*(?=)")%>%
-  discard(.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
-  #purrr::discard(names,.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
+  #discard(.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
+  purrr::discard(names,.p = ~stringr::str_detect(.x,"to our Radon-Bikes Instagram!|#bisbaldimwald"))
 names
 
 
@@ -489,16 +477,21 @@ price <-  html %>%
   html_text() %>% 
   #html_attr("class")%>%
   stringr::str_extract("(?<=).*(?=)") %>%
-  discard(.p = ~stringr::str_detect(.x," ₤"))%>%
+  purrr::discard(names,.p = ~stringr::str_detect(.x," ₤"))%>%
   as_tibble()%>%
   filter(row_number() %% 2 == 1)
 
 price
 
+```
 
-tibble(Model=names, Cost=price)
+Bike names and price in euros
+```{r}
 
-## tidyverse
+tibble(Model=names, "Cost  "=price)
+```
+
+# Data wrangling
 ```{r}
 # Libraries ----
 
@@ -513,13 +506,12 @@ library(data.table)
 library(tictoc)
 
 library(vroom)
+
 ```
-## Data wrangling
-### Tasks 1
+## Tasks 1
 ```{r}
 # first task ----
 
-library(vroom)
 
 col_types_assignee <- list(
   id = col_character(),
@@ -604,19 +596,18 @@ key(most_patents_us)
 
 setorderv(most_patents_us, c("N", "organization"), order = -1)
 
+```
+Patent Dominance: What US company / corporation has the most patents? 
+List the 10 US companies with the most assigned/granted patents.
 
+```{r}
 
 as_tibble(most_patents_us, .rows = 10)
-
-#Patent Dominance: What US company / 
-#corporation has the most patents? 
-#List the 10 US companies with the 
-#most assigned/granted patents.
 
 # use data.table  or dplyr
 # tables needed: assignee, patent_assignee
 ```
-### Tasks 2
+## Tasks 2
 ```{r}
 # second task ----
 
@@ -688,18 +679,22 @@ setorderv(patent_assignee_assignee_patent_2019, c("num_claims", "organization"),
 task_2_ans <- patent_assignee_assignee_patent_2019 %>%
   select(organization, num_claims, date)
 
+
+```
+Recent patent activity: What US company
+had the most patents granted in 2019?
+List the top 10 companies with the 
+most new granted patents for 2019.
+
+```{r}
+
 as_tibble(task_2_ans, .rows = 10)
 
-
-#Recent patent activity: What US company
-#had the most patents granted in 2019?
-#List the top 10 companies with the 
-#most new granted patents for 2019.
 
 # use data.table  or dplyr
 # tables needed: assignee, patent_assignee, patent
 ```
-### Tasks 3
+## Tasks 3
 ```{r}
 # third task ----
 
@@ -758,7 +753,9 @@ patent_assignee_assignee_uspc_tbl %>% glimpse()
             
             setorderv(most_patents_world, c("N", "organization"), order = -1)
             
-            
+```
+top 10 most patent holding companies world wide
+```{r}            
             
             as_tibble(most_patents_world, .rows = 10)
 
@@ -793,8 +790,9 @@ setkey(top_patent_class, "mainclass_id")
 key(top_patent_class)
 
 setorderv(top_patent_class, c("N", "mainclass_id"), order = -1)
-
-
+```
+most common patent out of top 10 companies
+```{r}
 
 as_tibble(top_patent_class, .rows = 5)
 
@@ -806,7 +804,156 @@ as_tibble(top_patent_class, .rows = 5)
 #For the top 10 companies (worldwide) 
 #with the most patents, what are the 
 #top 5 USPTO tech main classes?
+```
+Innovation in Tech: What is the most innovative tech sector? 
+For the top 10 companies (worldwide) with the most patents, what are the 
+top 5 USPTO tech main classes?.
 
+```{r}
 # use data.table  or dplyr
 # tables needed: assignee, patent_assignee, uspc
 ```
+# Data visualisation 
+
+
+```{r}
+
+#Goal: Map the time course of the cumulative Covid-19 cases! 
+#Adding the cases for Europe is optional. You can choose your 
+#own color theme, but don’t use the default one. Don’t forget 
+#to scale the axis properly. The labels can be added with 
+#geom_label() or with geom_label_repel() 
+#(from the package ggrepel).
+
+
+
+# Challenge 4----
+
+#Covid data analysis
+
+
+library(tidyverse)
+library(vroom)
+library(lubridate)
+library(data.table)
+library(tictoc)
+library(ggplot2)
+library(scales)
+
+
+covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv")
+
+
+
+
+#{r include=FALSE}
+covid_data_by_month_tbl <- covid_data_tbl %>%
+  select(cases, countriesAndTerritories, dateRep) %>%
+  filter(countriesAndTerritories %in% c("Germany",
+                                        "United_Kingdom",
+                                        "France",
+                                        "Spain",
+                                        "Lithuania",
+                                        "United_States_of_America")) %>%
+  mutate(date = dmy(dateRep)) %>% group_by(countriesAndTerritories, date) %>%
+  summarise(total_cases = cumsum(cases)) %>%
+  ungroup() 
+
+covid_data_by_month_tbl
+
+
+#Covid cases ----
+```
+Covid graph for few countries
+```{r}
+#{r plot5, fig.width=15, fig.height=7, echo=FALSE}
+covid_data_by_month_tbl%>%
+  ggplot(aes(x = date, y = total_cases, color = countriesAndTerritories)) +
+  #geom_line()+
+  #facet_wrap(~ countriesAndTerritories, ncol = 3) +
+  geom_smooth(method = "gam", se = FALSE) +
+  #geom_point()+
+  scale_color_manual(values=c("#000000", "#ff0016", "#3ea6d7", "#feff00", "#106a00", "#ff8e02"))+
+  labs(title = "Confirmed covid cases worldwide",
+       x = "Year 2020",
+       y = "Cases")
+
+
+
+
+#{r include=FALSE}
+
+
+#Goal: Visualize the distribution of the mortality rate
+#(deaths / population) with geom_map().
+
+# World Map ----
+
+world <- map_data("world")
+
+covid_mortality_tbl <- covid_data_tbl %>%
+  mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
+  mutate(countriesAndTerritories = case_when(
+    
+    countriesAndTerritories == "United Kingdom" ~ "UK",
+    countriesAndTerritories == "United States of America" ~ "USA",
+    countriesAndTerritories == "Czechia" ~ "Czech Republic",
+    TRUE ~ countriesAndTerritories
+    
+  ))%>%
+  group_by(countriesAndTerritories, popData2019, deaths) %>%
+  summarise(total_pop = max(popData2019))%>%
+  summarise(total_death = sum(deaths))%>%
+  summarise(mortality =  (total_death)/(popData2019))
+
+
+
+#{r include=FALSE}
+
+#class(covid_mortality_tbl)
+
+setDT(covid_mortality_tbl)
+
+#class(covid_mortality_tbl)
+
+covid_mortality_tbl %>% glimpse()
+
+setDT(world)
+
+world %>% glimpse()
+
+
+#{r include=FALSE}
+tic()
+covid_map_tbl <- merge(x = world, y = covid_mortality_tbl, 
+                          by.x = "region", by.y = "countriesAndTerritories",
+                          all.x = TRUE, 
+                          all.y = FALSE)
+
+toc()
+
+covid_map_tbl%>% glimpse()
+
+
+
+
+
+#{r include=FALSE}
+setkey(covid_map_tbl, "region")
+key(covid_map_tbl)
+
+setorderv(covid_map_tbl, c("mortality", "region", "long", "lat"), order = -1)
+
+
+```
+Covid map
+```{r}
+#{r plot6, fig.width=15, fig.height=7, echo=FALSE}
+covid_map_tbl%>%
+  ggplot() +
+  geom_map(aes(x = long, y = lat, map_id = region, fill = mortality),map = world) +
+  scale_fill_continuous(labels = scales::percent, low   = "green", high  = "red")+
+
+  labs(title = "Comfirmed covid deaths in relation to population size")
+```
+
