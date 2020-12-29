@@ -426,6 +426,19 @@ ebook_count<-data_lst%>%
   purrr::pluck("entries", "ebook_count")
 ```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 A table from a random API 
 ```{r}
 tibble(title ,work_count ,edition_count ,ebook_count)
@@ -485,7 +498,30 @@ price
 
 ```
 
+
+
+
+
+
+
+
+
+
+
+
 Bike names and price in euros
+
+
+
+
+
+
+
+
+
+
+
+
 ```{r}
 
 tibble(Model=names, "Cost  "=price)
@@ -597,8 +633,32 @@ key(most_patents_us)
 setorderv(most_patents_us, c("N", "organization"), order = -1)
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
 Patent Dominance: What US company / corporation has the most patents? 
 List the 10 US companies with the most assigned/granted patents.
+
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 
@@ -681,10 +741,28 @@ task_2_ans <- patent_assignee_assignee_patent_2019 %>%
 
 
 ```
+
+
+
+
+
+
+
+
+
 Recent patent activity: What US company
 had the most patents granted in 2019?
 List the top 10 companies with the 
 most new granted patents for 2019.
+
+
+
+
+
+
+
+
+
 
 ```{r}
 
@@ -754,7 +832,25 @@ patent_assignee_assignee_uspc_tbl %>% glimpse()
             setorderv(most_patents_world, c("N", "organization"), order = -1)
             
 ```
+
+
+
+
+
+
+
+
+
 top 10 most patent holding companies world wide
+
+
+
+
+
+
+
+
+
 ```{r}            
             
             as_tibble(most_patents_world, .rows = 10)
@@ -791,7 +887,25 @@ key(top_patent_class)
 
 setorderv(top_patent_class, c("N", "mainclass_id"), order = -1)
 ```
+
+
+
+
+
+
+
+
 most common patent out of top 10 companies
+
+
+
+
+
+
+
+
+
+
 ```{r}
 
 as_tibble(top_patent_class, .rows = 5)
@@ -805,9 +919,31 @@ as_tibble(top_patent_class, .rows = 5)
 #with the most patents, what are the 
 #top 5 USPTO tech main classes?
 ```
+
+
+
+
+
+
+
+
+
+
+
+
 Innovation in Tech: What is the most innovative tech sector? 
 For the top 10 companies (worldwide) with the most patents, what are the 
 top 5 USPTO tech main classes?.
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 # use data.table  or dplyr
@@ -847,24 +983,66 @@ covid_data_tbl <- read_csv("https://opendata.ecdc.europa.eu/covid19/casedistribu
 
 
 #{r include=FALSE}
-covid_data_by_month_tbl <- covid_data_tbl %>%
-  select(cases, countriesAndTerritories, dateRep) %>%
+covid_data_by_month_tbl <- covid_data_tbl %>% map_df(rev)%>%
+  select(cases_weekly, countriesAndTerritories, dateRep) %>%
   filter(countriesAndTerritories %in% c("Germany",
                                         "United_Kingdom",
                                         "France",
                                         "Spain",
                                         "Lithuania",
                                         "United_States_of_America")) %>%
-  mutate(date = dmy(dateRep)) %>% group_by(countriesAndTerritories, date) %>%
-  summarise(total_cases = cumsum(cases)) %>%
-  ungroup() 
+  mutate(date = dmy(dateRep)) %>% group_by(countriesAndTerritories ) %>%
+  mutate(total_cases = cumsum(cases_weekly))# %>%
+  #ungroup() 
+  
+covid_data_by_month_tbl 
 
-covid_data_by_month_tbl
+  tbl <- covid_data_tbl %>% map_df(rev)%>%
+  select(dateRep, countriesAndTerritories, cases_weekly) %>%
+  filter(countriesAndTerritories %in% c("Germany",
+                                        "United_Kingdom",
+                                        "France",
+                                        "Spain",
+                                        "Lithuania",
+                                        "United_States_of_America")) %>% 
+    group_by( countriesAndTerritories ) %>% 
+  mutate(total_cases = cumsum(cases_weekly))# %>% map_df(rev) 
+ tbl
+ tbl2 <- tbl[4]
+
+tbl2  
+  
+#total <- merge(covid_data_by_month_tbl, tbl)
+
+#total %>% group_by(countriesAndTerritories, date) %>% ungroup() 
+
+#total
 
 
 #Covid cases ----
 ```
+
+
+
+
+
+
+
+
+
+
 Covid graph for few countries
+
+
+
+
+
+
+
+
+
+
+
 ```{r}
 #{r plot5, fig.width=15, fig.height=7, echo=FALSE}
 covid_data_by_month_tbl%>%
@@ -891,7 +1069,7 @@ covid_data_by_month_tbl%>%
 
 world <- map_data("world")
 
-covid_mortality_tbl <- covid_data_tbl %>%
+covid_mortality_tbl <- covid_data_tbl %>% # map_df(rev)%>%
   mutate(across(countriesAndTerritories, str_replace_all, "_", " ")) %>%
   mutate(countriesAndTerritories = case_when(
     
@@ -901,10 +1079,10 @@ covid_mortality_tbl <- covid_data_tbl %>%
     TRUE ~ countriesAndTerritories
     
   ))%>%
-  group_by(countriesAndTerritories, popData2019, deaths) %>%
+  group_by(countriesAndTerritories, popData2019, deaths_weekly) %>%
   summarise(total_pop = max(popData2019))%>%
-  summarise(total_death = sum(deaths))%>%
-  summarise(mortality =  (total_death)/(popData2019))
+  mutate(total_death = sum(deaths_weekly))%>%
+  mutate(mortality =  (total_death)/(popData2019))
 
 
 
@@ -915,7 +1093,7 @@ covid_mortality_tbl <- covid_data_tbl %>%
 setDT(covid_mortality_tbl)
 
 #class(covid_mortality_tbl)
-
+covid_mortality_tbl
 covid_mortality_tbl %>% glimpse()
 
 setDT(world)
@@ -926,9 +1104,10 @@ world %>% glimpse()
 #{r include=FALSE}
 tic()
 covid_map_tbl <- merge(x = world, y = covid_mortality_tbl, 
-                          by.x = "region", by.y = "countriesAndTerritories",
-                          all.x = TRUE, 
-                          all.y = FALSE)
+                       by.x = "region", by.y = "countriesAndTerritories",
+                       all.x = TRUE, 
+                       all.y = FALSE,
+                       allow.cartesian=TRUE)
 
 toc()
 
@@ -946,14 +1125,40 @@ setorderv(covid_map_tbl, c("mortality", "region", "long", "lat"), order = -1)
 
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Covid map
+
+
+
+
+
+
+
+
+
+
+
+
 ```{r}
 #{r plot6, fig.width=15, fig.height=7, echo=FALSE}
 covid_map_tbl%>%
   ggplot() +
   geom_map(aes(x = long, y = lat, map_id = region, fill = mortality),map = world) +
   scale_fill_continuous(labels = scales::percent, low   = "green", high  = "red")+
-
+  
   labs(title = "Comfirmed covid deaths in relation to population size")
 ```
 
