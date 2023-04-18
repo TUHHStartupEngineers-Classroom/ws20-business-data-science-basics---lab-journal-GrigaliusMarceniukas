@@ -16,11 +16,21 @@ rmarkdown::render_site(encoding = 'UTF-8')
 ##########################################################################
 
 system( paste0("staticrypt ./docs/journal.html ", Sys.getenv("LAB_KEY")) )
+#shell( paste0("staticrypt ./docs/journal.html ", Sys.getenv("LAB_KEY")) )
+#system( paste0("staticrypt ./docs/journal.html ", LAB_KEY) )
 
 # Remove and rename resulting files
 file.remove("./docs/journal.html")
 file.rename(from = "./docs/journal_encrypted.html", 
             to   = "./docs/journal.html")
+
+#system( paste0("staticrypt ./docs/grigaliusMarceniukas.html ", LAB_KEY) )
+
+# Remove and rename resulting files
+#file.remove("./docs/journal.html")
+#file.rename(from = "./docs/journal_encrypted.html", 
+#            to   = "./docs/grigaliusMarceniukas.html")
+
 
 # Open local html file in your browser
 browseURL("./docs/index.html")
